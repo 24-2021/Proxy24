@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Proxy 24",
-  "version": "3.0",
+  "name": "Proxy24",
+  "version": "3.1",
   "permissions": [
     "proxy",
     "storage",

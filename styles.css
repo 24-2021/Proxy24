@@ -13,6 +13,7 @@
   --tab-inactive: #444444;
   --hover-bg: #222222;
   --btn-text-color: #000000; /* 深色模式下按钮文字为黑色 */
+  --global-radius: 12px; /* 全局圆角变量 */
 }
 
 body.light-theme {
@@ -32,7 +33,7 @@ body.light-theme {
 }
 
 body {
-  font-family: 'Segoe UI', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   width: 360px;
   margin: 0;
   padding: 0;
@@ -54,7 +55,7 @@ body {
   color: var(--text-secondary);
   transition: color 0.2s;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: var(--global-radius);
 }
 
 .action-icon:hover {
@@ -73,7 +74,7 @@ body {
 .icon-option {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: var(--global-radius);
   cursor: pointer;
   border: 1px solid var(--border-color);
   background-color: var(--input-bg);
@@ -127,7 +128,7 @@ body {
 .whitelist-list-container {
   position: relative;
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: var(--global-radius);
   background-color: var(--input-bg);
   overflow: hidden;
 }
@@ -146,7 +147,7 @@ body {
 
 #whitelist-items option {
   padding: 6px 10px;
-  border-radius: 4px;
+  border-radius: var(--global-radius);
   margin-bottom: 2px;
 }
 
@@ -171,7 +172,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: var(--global-radius);
   background-color: #555;
   color: white;
   font-size: 18px;
@@ -282,9 +283,30 @@ h3 {
 }
 
 .proxy-item.active {
-  background-color: var(--hover-bg);
+  background-color: rgba(255, 255, 255, 0.1);
   border-left: 4px solid var(--accent-color);
   padding-left: 12px;
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.05);
+}
+
+body.light-theme .proxy-item.active {
+  background-color: rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.02);
+}
+
+.proxy-item.active::after {
+  content: '●';
+  color: var(--success-color);
+  position: absolute;
+  right: 50px; /* 放在删除按钮左侧 */
+  font-size: 12px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
 }
 
 /* 移除这个样式，避免它覆盖 JS 设置的颜色 */
@@ -331,7 +353,7 @@ h3 {
 .proxy-action-btn {
   padding: 6px;
   margin-left: 8px;
-  border-radius: 4px;
+  border-radius: var(--global-radius);
   color: var(--text-secondary);
   background: transparent;
   border: none;
@@ -357,7 +379,7 @@ h3 {
 /* 卡片和表单样式 (用于添加代理和白名单) */
 .card {
   background-color: var(--card-bg);
-  border-radius: 8px;
+  border-radius: var(--global-radius);
   padding: 12px;
   margin-bottom: 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
@@ -380,7 +402,7 @@ select, input, textarea {
   width: 100%;
   padding: 8px 10px;
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: var(--global-radius);
   box-sizing: border-box;
   font-size: 14px;
   background-color: var(--input-bg);
@@ -401,7 +423,7 @@ textarea {
 button {
   padding: 10px;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--global-radius);
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
@@ -462,7 +484,7 @@ button:hover {
 
 .message {
   padding: 10px 20px;
-  border-radius: 4px;
+  border-radius: var(--global-radius);
   margin-bottom: 10px;
   color: white;
   font-size: 14px;

@@ -1,24 +1,68 @@
 // 在 chrome.runtime.onInstalled 事件处理函数中初始化白名单
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.sync.set({
-    proxies: [
-      { type: 'http', host: '127.0.0.1', port: 8080 },
-      { type: 'socks5', host: '127.0.0.1', port: 9050 }
-    ],
-    isProxyEnabled: false,
-    currentProxy: 0,
-    whitelist: [] // 初始化白名单为空数组
-  }, function() {
-    console.log('默认设置已完成。');
-    // 初始化时设置为直连模式
-    chrome.proxy.settings.set({
-      value: { mode: 'direct' },
-      scope: 'regular'
-    }, function() {
-      console.log('初始代理设置为直连模式');
+  // 从 config.yaml 加载白名单
+  fetch('config.yaml')
+    .then(response => response.text())
+    .then(yamlText => {
+      // 简单解析 YAML 文件中的白名单
+      const whitelist = parseWhitelistFromYaml(yamlText);
+      
+      chrome.storage.sync.set({
+        proxies: [
+          { type: 'http', host: '127.0.0.1', port: 8080 },
+          { type: 'socks5', host: '127.0.0.1', port: 10808 }
+        ],
+        isProxyEnabled: false,
+        currentProxy: 0,
+        whitelist: whitelist // 使用从 config.yaml 加载的白名单
+      }, function() {
+        console.log('默认设置已完成。白名单已从 config.yaml 加载，共 ' + whitelist.length + ' 个域名');
+        // 初始化时设置为直连模式
+        chrome.proxy.settings.set({
+          value: { mode: 'direct' },
+          scope: 'regular'
+        }, function() {
+          console.log('初始代理设置为直连模式');
+        });
+      });
+    })
+    .catch(error => {
+      console.error('加载 config.yaml 失败:', error);
+      // 如果加载失败，使用空白名单
+      chrome.storage.sync.set({
+        proxies: [
+          { type: 'http', host: '127.0.0.1', port: 8080 },
+          { type: 'socks5', host: '127.0.0.1', port: 9050 }
+        ],
+        isProxyEnabled: false,
+        currentProxy: 0,
+        whitelist: [] // 初始化白名单为空数组
+      });
     });
-  });
 });
+
+// 简单解析 YAML 文件中的白名单
+function parseWhitelistFromYaml(yamlText) {
+  const whitelist = [];
+  const lines = yamlText.split('\n');
+  let inWhitelistSection = false;
+  
+  for (const line of lines) {
+    if (line.trim().startsWith('whitelist:')) {
+      inWhitelistSection = true;
+      continue;
+    }
+    
+    if (inWhitelistSection && line.trim().startsWith('-')) {
+      const domain = line.trim().substring(1).trim();
+      if (domain && !domain.startsWith('#')) {
+        whitelist.push(domain);
+      }
+    }
+  }
+  
+  return whitelist;
+}
 
 // 监听来自popup.js的消息
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -91,6 +135,9 @@ function addToWhitelist(domain, callback) {
     // 添加到白名单
     whitelist.push(domain);
     chrome.storage.sync.set({whitelist: whitelist}, function() {
+      // 更新 config.yaml 文件
+      updateConfigYaml(whitelist);
+      
       // 如果代理已启用，更新代理设置以应用新的白名单
       chrome.storage.sync.get(['isProxyEnabled', 'proxies', 'currentProxy'], function(data) {
         if (data.isProxyEnabled && data.proxies && data.proxies[data.currentProxy]) {
@@ -104,19 +151,39 @@ function addToWhitelist(domain, callback) {
 
 // 从白名单移除域名
 function removeFromWhitelist(domain, callback) {
+  if (!domain) {
+    callback({success: false, message: '域名不能为空'});
+    return;
+  }
+
+  // 格式化域名，确保与存储的格式一致
+  domain = formatDomain(domain);
+  
   chrome.storage.sync.get(['whitelist'], function(data) {
     let whitelist = data.whitelist || [];
     
-    // 过滤掉要移除的域名
-    whitelist = whitelist.filter(item => item !== domain);
+    // 检查域名是否存在于白名单中
+    const index = whitelist.indexOf(domain);
+    if (index === -1) {
+      callback({success: false, message: '该域名不在白名单中'});
+      return;
+    }
+    
+    // 使用 splice 移除指定域名
+    whitelist.splice(index, 1);
     
     chrome.storage.sync.set({whitelist: whitelist}, function() {
+      if (chrome.runtime.lastError) {
+        callback({success: false, message: '保存白名单时出错：' + chrome.runtime.lastError.message});
+        return;
+      }
+
       // 如果代理已启用，更新代理设置以应用新的白名单
       chrome.storage.sync.get(['isProxyEnabled', 'proxies', 'currentProxy'], function(data) {
         if (data.isProxyEnabled && data.proxies && data.proxies[data.currentProxy]) {
           updateProxySettings(true, data.proxies[data.currentProxy]);
         }
-        callback({success: true, whitelist: whitelist});
+        callback({success: true, whitelist: whitelist, message: '域名已成功从白名单中移除'});
       });
     });
   });
@@ -280,3 +347,33 @@ chrome.webRequest.onAuthRequired.addListener(
   {urls: ["<all_urls>"]},
   ["asyncBlocking"]
 );
+
+// 更新 config.yaml 文件
+function updateConfigYaml(whitelist) {
+  // 由于浏览器扩展无法直接写入文件系统，我们需要通过下载文件的方式让用户更新 config.yaml
+  // 创建一个包含更新后白名单的 YAML 文本
+  let yamlContent = "# Proxy 24 配置文件\nwhitelist:\n  # 白名单域名列表，每行一个域名\n";
+  whitelist.forEach(domain => {
+    yamlContent += `  - ${domain}\n`;
+  });
+  
+  // 创建一个下载链接
+  const blob = new Blob([yamlContent], {type: 'text/yaml'});
+  const url = URL.createObjectURL(blob);
+  
+  // 创建并触发下载
+  chrome.downloads.download({
+    url: url,
+    filename: 'config.yaml',
+    saveAs: true
+  }, function(downloadId) {
+    if (chrome.runtime.lastError) {
+      console.error('下载 config.yaml 失败:', chrome.runtime.lastError);
+    } else {
+      console.log('config.yaml 已准备下载，ID:', downloadId);
+    }
+    
+    // 释放 URL 对象
+    URL.revokeObjectURL(url);
+  });
+}

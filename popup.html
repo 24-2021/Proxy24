@@ -12,77 +12,101 @@
   <div class="title-container">
     <h2>Proxy 24</h2>
     <span class="subtitle">by 24</span>
+    
+    <div class="header-actions">
+        <div id="theme-toggle" class="action-icon" title="切换主题">🌗</div>
+        <div id="lang-toggle" class="action-icon" title="Switch Language">🌐</div>
+    </div>
   </div>
   
   <!-- 选项卡导航 -->
   <div class="tabs">
-    <div class="tab active" data-tab="proxy">代理设置</div>
-    <div class="tab" data-tab="add-proxy">添加代理</div>
-    <div class="tab" data-tab="whitelist">白名单</div>
+    <div class="tab active" data-tab="proxy" data-i18n="tab_proxy">代理设置</div>
+    <div class="tab" data-tab="add-proxy" data-i18n="tab_add">添加代理</div>
+    <div class="tab" data-tab="whitelist" data-i18n="tab_whitelist">白名单</div>
   </div>
   
   <!-- 代理设置选项卡内容 -->
-  <div id="proxy-tab" class="tab-content active">
-    <div class="card">
-      <label for="proxy-select">选择代理:</label>
-      <select id="proxy-select"></select>
-      
-      <div class="proxy-controls">
-        <button id="toggle-proxy" type="button" class="btn-success">启用代理</button>
-        <button id="delete-proxy" type="button" class="btn-warning">删除代理</button>
-      </div>
-      
-      <div id="status-indicator"></div>
+  <div id="proxy-tab" class="tab-content active" style="padding: 0;">
+    <div id="proxy-list" class="proxy-list">
+      <!-- 列表由 JS 动态生成 -->
     </div>
   </div>
   
   <!-- 添加代理选项卡内容 -->
   <div id="add-proxy-tab" class="tab-content">
     <div class="card">
-      <h3>添加新代理</h3>
-      <div class="form-group">
-        <label for="proxy-type">类型:</label>
-        <select id="proxy-type">
-          <option value="http">HTTP</option>
-          <option value="https">HTTPS</option>
-          <option value="socks4">SOCKS4</option>
-          <option value="socks5">SOCKS5</option>
-        </select>
-      </div>
+      <h3 data-i18n="add_new_proxy">添加新代理</h3>
       
+      <div class="name-type-container">
+        <div class="form-group" style="flex: 2;">
+          <label for="proxy-name" data-i18n="label_name">名称 (可选):</label>
+          <input type="text" id="proxy-name" placeholder="例如: 公司代理..." data-i18n-placeholder="placeholder_name">
+        </div>
+        
+        <div class="form-group" style="flex: 1;">
+          <label for="proxy-type" data-i18n="label_type">类型:</label>
+          <select id="proxy-type">
+            <option value="http">HTTP</option>
+            <option value="https">HTTPS</option>
+            <option value="socks4">SOCKS4</option>
+            <option value="socks5">SOCKS5</option>
+          </select>
+        </div>
+      </div>
+
       <div class="host-port-container">
         <div class="form-group">
-          <label for="proxy-host">主机:</label>
+          <label for="proxy-host" data-i18n="label_host">主机:</label>
           <input type="text" id="proxy-host" placeholder="💥127.0.0.1">
         </div>
         
         <div class="form-group">
-          <label for="proxy-port">端口:</label>
+          <label for="proxy-port" data-i18n="label_port">端口:</label>
           <input type="number" id="proxy-port" placeholder="💥8080">
         </div>
       </div>
       
       <div class="auth-container">
         <div class="form-group">
-          <label for="proxy-username">用户名:</label>
+          <label for="proxy-username" data-i18n="label_username">用户名:</label>
           <input type="text" id="proxy-username" placeholder="🔒username">
         </div>
         
         <div class="form-group">
-          <label for="proxy-password">密码:</label>
+          <label for="proxy-password" data-i18n="label_password">密码:</label>
           <input type="password" id="proxy-password" placeholder="🔒password">
         </div>
       </div>
+
+      <div class="form-group">
+        <label data-i18n="label_icon">选择图标:</label>
+        <div class="icon-picker" id="icon-picker">
+          <div class="icon-option selected" data-icon="🌐">🌐</div>
+          <div class="icon-option" data-icon="🏠">🏠</div>
+          <div class="icon-option" data-icon="🏢">🏢</div>
+          <div class="icon-option" data-icon="🎮">🎮</div>
+          <div class="icon-option" data-icon="☁️">☁️</div>
+          <div class="icon-option" data-icon="🔒">🔒</div>
+          <div class="icon-option" data-icon="🚀">🚀</div>
+          <div class="icon-option" data-icon="⚡">⚡</div>
+          <div class="icon-option" data-icon="🛡️">🛡️</div>
+          <div class="icon-option" data-icon="👻">👻</div>
+          <div class="icon-option" data-icon="✈️">✈️</div>
+          <div class="icon-option" data-icon="🔧">🔧</div>
+        </div>
+        <input type="hidden" id="proxy-icon" value="🌐">
+      </div>
       
-      <button id="add-proxy" type="button" class="btn-primary">添加代理</button>
+      <button id="add-proxy" type="button" class="btn-primary" data-i18n="btn_add_proxy">添加代理</button>
     </div>
   </div>
   
   <!-- 白名单选项卡内容 -->
   <div id="whitelist-tab" class="tab-content">
     <div class="card">
-      <h3>白名单管理</h3>
-      <p class="help-text">添加到白名单的域名将直接连接，不通过代理</p>
+      <h3 data-i18n="whitelist_manager">白名单管理</h3>
+      <p class="help-text" data-i18n="whitelist_help">添加到白名单的域名将直接连接，不通过代理</p>
       
       <!-- 删除这部分
       <div class="form-group">
@@ -95,21 +119,19 @@
       <div class="divider"></div>
       -->
       
-      <div class="form-group">
-        <textarea id="batch-whitelist" placeholder="多个域名请用换行分隔"></textarea>
-      </div>
-      
-      <button id="batch-add-whitelist" type="button" class="btn-primary">添加到白名单</button>
-      
-      <div class="divider"></div>
-      
-      <div class="form-group">
-        <select id="whitelist-items" size="5"></select>
-      </div>
-      
-      <div class="whitelist-controls">
-        <button id="remove-whitelist" type="button" class="btn-warning">移除选中</button>
-        <button id="clear-whitelist" type="button" class="btn-danger">清空白名单</button>
+      <div class="whitelist-container">
+        <div class="whitelist-input-group">
+          <textarea id="batch-whitelist" placeholder="输入域名 (每行一个)" data-i18n-placeholder="placeholder_whitelist"></textarea>
+          <button id="batch-add-whitelist" type="button" class="btn-primary" data-i18n="btn_add">添加</button>
+        </div>
+        
+        <div class="whitelist-list-container">
+          <select id="whitelist-items" size="8"></select>
+          <div class="whitelist-actions">
+            <button id="remove-whitelist" type="button" class="btn-icon" title="移除选中">🗑️</button>
+            <button id="clear-whitelist" type="button" class="btn-icon btn-danger-icon" title="清空全部">🧹</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

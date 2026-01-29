@@ -1,7 +1,6 @@
 # Proxy 24 配置文件
 whitelist:
   # 白名单域名列表，每行一个域名
-  - gov.cn
   - baidu.com
   - microsoft.com
   - microsoftonline.com
@@ -45,4 +44,5 @@ whitelist:
   - csdn.net
   - sogou.com
   - 360.cn
+
   - huawei.com

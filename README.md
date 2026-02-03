@@ -21,9 +21,9 @@
 
 ## 应用商店
 
-Firefox-已申请(待通过)
+Firefox-https://addons.mozilla.org/zh-CN/firefox/addon/proxy24/
 
-Microsoft Edge-已申请(待通过)
+Microsoft Edge-https://microsoftedge.microsoft.com/addons/detail/proxy24/ehlobeopbpgminfelkofbcmkdigibnej
 
 Quark-已申请(待通过)
 
@@ -91,4 +91,5 @@ Quark-已申请(待通过)
 ♥感谢3had0w师傅提出优化建议
 
 ♥感谢en0t5f师傅提出优化建议
+
 

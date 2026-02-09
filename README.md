@@ -8,6 +8,8 @@
 - Microsoft Edge
 - Firefox
 - Quark
+- Vivaldi
+- Brave
 
 ## 支持的协议
 
@@ -95,6 +97,7 @@ Quark-已申请(待通过)
 ♥感谢en0t5f师傅提出优化建议
 
 ♥感谢罗辑师傅提出Firefox商城安装的插件会有被系统代理覆盖的bug
+
 
 
 
